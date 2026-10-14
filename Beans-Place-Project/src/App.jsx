@@ -34,6 +34,17 @@
 import FeaturesSection from "./components/FeaturesSection";
 import ProductShowcase from "./components/ProductShowcase";
 
+
+
+
+import imgEthiopianHarrar from "./assets/imgEthiopian-Harrar-Bag.png";
+import imgColombianSupremo from "./assets/imgColombian-Supremo-Bag.png";
+import imgKenyaAA from "./assets/imgKenya-AA-Bag.png";
+import imgPanamaGeisha from "./assets/imgPanama-Geisha-Bag.png";
+import imgKona from "./assets/imgKona-Bag.png";
+import imgGuatamalanAntigua from "./assets/imgGuatamalan-Antigua-Bag.png";
+
+
 // STEP 2: Create and export the App component
 // Use: export default function App() { ... }
 //
@@ -60,7 +71,122 @@ import ProductShowcase from "./components/ProductShowcase";
 
 // imports go below here
 
+const productCatalog = [
+    {
+        id: 1, 
+        name: "Ethiopian Harrar",
+        origin: "Ethiopia",
+        price: 18.99,
+        roast: "Medium",
+        notes: "Blueberry, dark chocolate, wine",
+        image: imgEthiopianHarrar,
+        badge: "Best Seller"
+    },
+    {
+        id: 2, 
+        name: "Colombian Supremo",
+        origin: "Colombia",
+        price: 16.99,
+        roast: "Medium Dark",
+        notes: "Caramel, nutty smooth finish",
+        image: imgColombianSupremo,
+        badge: null
+    },
+    {
+        id: 3, 
+        name: "Kenya AA",
+        origin: "Kenya",
+        price: 21.99,
+        roast: "Light",
+        notes: "Bright citrus, black currant, floral",
+        image: imgKenyaAA,
+        badge: "Staff Pick"
+    },
+    {
+        id: 4, 
+        name: "Panama Geisha",
+        origin: "Panama",
+        price: 34.99,
+        roast: "Light",
+        notes: "Jasmine, bergamot, tropical fruit",
+        image: imgPanamaGeisha,
+        badge: "Limited"
+    },
+    {
+        id: 5, 
+        name: "Kona",
+        origin: "Hawaii",
+        price: 19.99,
+        roast: "Medium",
+        notes: "Brown sugar, macadamia, mild acidity",
+        image: imgKona,
+        badge: null
+    },
+        {
+        id: 6, 
+        name: "Guatamalan Antigua",
+        origin: "Guatemala",
+        price: 17.99,
+        roast: "Dark Roast",
+        notes: "Cocoa, spice, smokey sweetness",
+        image: imgGuatamalanAntigua,
+        badge: "New"
+    },
+]
+
 export default function App() {
+    const [cartOpen, setCartOpen] = useState(false);
+    const [cartItems, setCartItems] = useState([]);
+    const [theme, setTheme] = useState(() => {
+        if (typeof window === "undefined") return "light";
+        const savedTheme = window.localStorage.getItem("theme");
+        if (savedTheme === "light" || savedTheme === "dark") return savedTheme;
+        return window.matchMedia("(prefer-color-scheme: dark)").matches
+            ? "dark"
+            : "light";
+    });
+
+    useEffect(() => {
+        document.documentElement.classList.toggle("dark", theme === "dark");
+        window.localStorage.setItem("theme", theme);
+    }, [theme]);
+
+    const toggleCart = () => setCartOpen((open) => !open);
+
+    const addToCart = (product) => {
+        setCartItems((current) => {
+            const existing = current.find((item) => item.id === product.id);
+            if (existing) {
+                return current.map((item) => 
+                    item.id === product.id ? { ...item, qty: item.qty +1 } : item,
+                );
+            }
+            return [...current, { ...product, qty: 1 }];
+        });
+    };
+
+    const updateCartQty = (id, delta) => {
+        setCartItems((current) => 
+         current
+            .map((item) => 
+                item.id === id 
+                    ? { ...item, qty: Math.max(0, item.qty + delta) }
+                        : item,
+            )
+            .filter((item) => item.qty > 0),
+        );
+    };
+    
+
+    const removeFromCart = (id) => {
+        setCartItems((current) => current.filter((item) => item.id !== id));
+    };
+
+    const cartCount = useMemo(
+        () => cartItems.reduce((sum, item) => sum +item.qty, 0),
+        [cartItems]
+    );
+
     return(
         <div className="app">
                {/* NAVBAR */}
